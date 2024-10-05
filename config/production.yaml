@@ -1,8 +1,12 @@
 env: "development"
-db_name: "flights"
-host: ""
-port: ""
-username: ""
-password: ""
+
+database:
+  name: "flights"
+  host: "localhost"
+  port: "5432"
+  username: "your_username"
+  password: "your_password"
+
 http_server:
-  address: "http://localhost:8000"
+  address: "http://localhost"
+  port: "8000"
