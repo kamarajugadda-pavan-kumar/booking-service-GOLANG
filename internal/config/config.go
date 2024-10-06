@@ -33,10 +33,10 @@ func MustGetConfig() Config {
 
 	configPath = os.Getenv("CONFIG_PATH")
 	if configPath == "" {
-		flags := flag.String("config", "", "path to config file")
+		configFlag := flag.String("config", "", "path to config file")
 		flag.Parse()
 
-		configPath = *flags
+		configPath = *configFlag
 		if configPath == "" {
 			log.Fatal("config path not provided")
 		}
