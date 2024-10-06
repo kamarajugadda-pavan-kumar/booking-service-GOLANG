@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/config"
+	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/db"
+	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/http/handlers/booking"
 )
 
 func main() {
@@ -20,14 +22,13 @@ func main() {
 	cfg := config.MustGetConfig()
 
 	// database setup
+	db.InitDBCredentials(&cfg.Database)
+	db := db.GetDB()
+	defer db.Close()
 
 	// setup router
 	router := http.NewServeMux()
-	router.HandleFunc("GET /api/v1/bookings", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(`{"message": "Booking created successfully"}`))
-	})
+	router.HandleFunc("GET /api/v1/bookings", booking.CreateBooking())
 
 	// setup http server
 	httpServer := &http.Server{
