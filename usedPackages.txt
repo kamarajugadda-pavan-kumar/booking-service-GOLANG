@@ -1,1 +1,7 @@
 cleanenv
+
+golang-migrate
+    command to create a migration files
+    `migrate create -ext sql -dir internal/db/migrations/ -seq init`
+
+    `migrate -path internal/db/migrations/ -database "mysql://username:password@tcp(host:port)/database" -verbose up`
