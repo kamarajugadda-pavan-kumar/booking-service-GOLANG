@@ -11,9 +11,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/config"
 	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/db"
-	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/http/handlers/booking"
+	handlers_v1 "github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/http/handlers/v1"
 )
 
 func main() {
@@ -27,8 +28,9 @@ func main() {
 	defer db.Close()
 
 	// setup router
-	router := http.NewServeMux()
-	router.HandleFunc("GET /api/v1/bookings", booking.CreateBooking())
+	// router := http.NewServeMux()
+	router := mux.NewRouter()
+	handlers_v1.RegisterV1Routes(router)
 
 	// setup http server
 	httpServer := &http.Server{
