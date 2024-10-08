@@ -1,5 +1,5 @@
 cleanenv
-
+go get -u github.com/gorilla/mux
 golang-migrate
     command to create a migration files
     `migrate create -ext sql -dir internal/db/migrations/ -seq init`
