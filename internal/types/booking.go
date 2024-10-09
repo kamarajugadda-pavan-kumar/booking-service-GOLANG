@@ -17,3 +17,8 @@ type Booking struct {
 	NumOfSeats int64  `json:"num_of_seats"`
 	TotalCost  int64  `json:"total_cost"`
 }
+
+type CreateBookingBody struct {
+	UserID     int64 `json:"userId"`
+	NumOfSeats int64 `json:"numOfSeats"`
+}

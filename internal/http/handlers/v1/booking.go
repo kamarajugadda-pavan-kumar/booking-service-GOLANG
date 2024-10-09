@@ -1,19 +1,16 @@
 package handlers_v1
 
 import (
-	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
+	service "github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/http/services"
+	types "github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/types"
 )
 
 func RegisterBookingRoutes(router *mux.Router) {
 	router.HandleFunc("/api/v1/bookings/{flightID}", CreateBooking()).Methods("POST")
-}
-
-type CreateBookingBody struct {
-	UserID     int64 `json:"userId"`
-	NumOfSeats int64 `json:"numOfSeats"`
 }
 
 func CreateBooking() http.HandlerFunc {
@@ -21,12 +18,39 @@ func CreateBooking() http.HandlerFunc {
 		vars := mux.Vars(r)
 		flightIDStr := vars["flightID"]
 
-		var body CreateBookingBody
-		json.NewDecoder(r.Body).Decode(&body)
+		// Parse form data
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "Unable to parse form", http.StatusBadRequest)
+			return
+		}
 
-		// send response
+		// Extract form values
+		userIdStr := r.FormValue("userId")
+		numOfSeatsStr := r.FormValue("numOfSeats")
+
+		// Convert form values to the appropriate types
+		userId, err := strconv.ParseInt(userIdStr, 10, 64)
+		if err != nil {
+			http.Error(w, "Invalid userId", http.StatusBadRequest)
+			return
+		}
+		numOfSeats, err := strconv.ParseInt(numOfSeatsStr, 10, 64)
+		if err != nil {
+			http.Error(w, "Invalid numOfSeats", http.StatusBadRequest)
+			return
+		}
+
+		body := types.CreateBookingBody{UserID: userId, NumOfSeats: numOfSeats}
+
+		bookingRes, err := service.CreateBookingService(flightIDStr, body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Creating booking for flight ID: " + flightIDStr))
+		w.Write([]byte(bookingRes))
 
 		// Additional business logic can go here
 
