@@ -6,6 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 	service "github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/http/services"
+	utils "github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/utils/common"
 )
 
 func RegisterBookingRoutes(router *mux.Router) {
@@ -27,6 +28,8 @@ func CreateBooking() http.HandlerFunc {
 		userIdStr := r.FormValue("userId")
 		numOfSeatsStr := r.FormValue("numOfSeats")
 
+		response := utils.Response{}
+
 		numOfSeats, err := strconv.ParseInt(numOfSeatsStr, 10, 64)
 		if err != nil {
 			http.Error(w, "Invalid numOfSeats", http.StatusBadRequest)
@@ -41,9 +44,15 @@ func CreateBooking() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		// w.Write([]byte(bookingRes))
+		successRes, err := response.SuccessResponse(
+			"Booking was initialised, complete payment to confirm booking",
+			"")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-		// Additional business logic can go here
+		w.Write(successRes)
 
 	}
 }

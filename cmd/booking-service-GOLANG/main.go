@@ -13,6 +13,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/config"
+	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/cronjob"
 	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/db"
 	handlers_v1 "github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/http/handlers/v1"
 )
@@ -28,7 +29,6 @@ func main() {
 	defer db.Close()
 
 	// setup router
-	// router := http.NewServeMux()
 	router := mux.NewRouter()
 	handlers_v1.RegisterV1Routes(router)
 
@@ -50,6 +50,11 @@ func main() {
 			log.Fatal(err)
 		}
 	}()
+
+	//================================================================
+	//  Start the cron job to clean expired bookings
+	go cronjob.CleanExpiredBookings()
+	//================================================================
 
 	<-done
 

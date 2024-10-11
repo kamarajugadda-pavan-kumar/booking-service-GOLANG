@@ -11,11 +11,14 @@ const (
 )
 
 type Booking struct {
-	FlightID   string `json:"flight_id"`
-	UserID     string `json:"user_id"`
-	Status     Status `json:"status"`
-	NumOfSeats int64  `json:"num_of_seats"`
-	TotalCost  int64  `json:"total_cost"`
+	BookingID  string  `json:"bookingId"`
+	FlightID   string  `json:"flightId"`
+	UserID     string  `json:"userId"`
+	Status     Status  `json:"status"`
+	NumOfSeats int64   `json:"numOfSeats"`
+	TotalCost  float64 `json:"totalCost"`
+	CreatedAt  string  `json:"createdAt"`
+	UpdatedAt  string  `json:"updatedAt"`
 }
 
 type CreateBookingBody struct {
