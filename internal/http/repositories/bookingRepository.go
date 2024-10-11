@@ -37,6 +37,5 @@ func BookingRepository(booking types.Booking) (string, error) {
 		return "", errors.New("failed to commit transaction: " + err.Error())
 	}
 
-	return fmt.Sprintf("Booking created successfully for user ID: %d", booking.UserID), nil
-
+	return fmt.Sprintf("Booking created successfully for user ID: %s", booking.UserID), nil
 }

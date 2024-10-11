@@ -11,8 +11,8 @@ const (
 )
 
 type Booking struct {
-	FlightID   int64  `json:"flight_id"`
-	UserID     int64  `json:"user_id"`
+	FlightID   string `json:"flight_id"`
+	UserID     string `json:"user_id"`
 	Status     Status `json:"status"`
 	NumOfSeats int64  `json:"num_of_seats"`
 	TotalCost  int64  `json:"total_cost"`

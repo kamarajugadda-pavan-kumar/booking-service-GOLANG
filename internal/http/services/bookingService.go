@@ -1,66 +1,82 @@
 package service
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
 
 	repository "github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/http/repositories"
+	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/http/servicebase"
 	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/types"
 )
 
-func CreateBookingService(flightID string, body types.CreateBookingBody) (string, error) {
+var servicebaseObj = servicebase.ServiceBase{BaseUrl: "http://localhost:3000"}
 
-	json.Marshal(body)
-
-	response, err := http.NewRequest(http.MethodPatch,
-		"http://localhost:3001/api/v1/flight/"+flightID,
-		bytes.NewReader())
-
+func BlockSeats(flightId string, numOfSeats int) error {
+	type BlockFlightSeatsBody struct {
+		noOfSeats int
+		action    string
+	}
+	_, err := servicebaseObj.PUT_POST_PATCH(
+		servicebase.MethodPatch,
+		"/flights/:id",
+		BlockFlightSeatsBody{noOfSeats: numOfSeats, action: "decrease"})
 	if err != nil {
-		return "", err
+		return err
 	}
-	defer response.Body.Close()
+	return nil
+}
 
-	jsonResponse, err := io.ReadAll(response.Body)
+func UnblockSeats(flightId string, numOfSeats int) error {
+	type UnBlockFlightSeatsBody struct {
+		noOfSeats int
+		action    string
+	}
+	_, err := servicebaseObj.PUT_POST_PATCH(
+		servicebase.MethodPatch,
+		"/api/v1/flights/:id",
+		UnBlockFlightSeatsBody{noOfSeats: numOfSeats, action: "increase"})
 	if err != nil {
-		fmt.Printf("Failed to read response body: %s\n", err)
-		return "", errors.New("failed to read response body")
+		return err
+	}
+	return nil
+}
+
+func FetchFlightDetails(flightId string) (types.FlightData, error) {
+	flightResponse, err := servicebaseObj.GET("/api/v1/flight/" + flightId)
+	if err != nil {
+		fmt.Printf("Failed to fetch flight details: %s\n", err)
+	}
+	var flightData types.FlightData
+	json.Unmarshal(flightResponse, &flightData)
+	return flightData, err
+}
+
+func MakeBooking(flightId string, userId string, numOfSeats int) error {
+
+	flightDetails, err := FetchFlightDetails(flightId)
+	if err != nil {
+		return err
 	}
 
-	var apiResponse types.ApiResponse
-	err1 := json.Unmarshal([]byte(jsonResponse), &apiResponse)
-	if err1 != nil {
-		fmt.Println("Error unmarshaling JSON:", err)
-		return "", errors.New("failed to unmarshal response ")
+	blockingSeatsErr := BlockSeats(flightId, numOfSeats)
+	if blockingSeatsErr != nil {
+		return blockingSeatsErr
 	}
 
-	fmt.Println(apiResponse.Data)
-
-	var flightData *types.FlightData = &apiResponse.Data
-	if flightData.TotalSeats < body.NumOfSeats {
-		return "", errors.New("not enough seats available")
-	}
-
-	var totalCost int64 = flightData.Price * body.NumOfSeats
-
-	// Create the booking in the database
-	booking := types.Booking{
-		FlightID:   2,
-		UserID:     body.UserID,
+	bookingData := types.Booking{
+		FlightID:   flightId,
+		UserID:     userId,
 		Status:     types.Initiated,
-		NumOfSeats: body.NumOfSeats,
-		TotalCost:  totalCost,
+		NumOfSeats: int64(numOfSeats),
+		TotalCost:  int64(numOfSeats) * flightDetails.Price,
+	}
+	_, bookingErr := repository.BookingRepository(bookingData)
+	if bookingErr != nil {
+		// If booking fails, unblock seats
+		UnblockSeats(flightId, numOfSeats)
+		return errors.New("booking failed, seats unblocked")
 	}
 
-	res, err := repository.BookingRepository(booking)
-	if err != nil {
-		return "", err
-	}
-
-	return res, nil
-
+	return nil
 }
