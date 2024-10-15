@@ -11,6 +11,7 @@ import (
 
 func RegisterBookingRoutes(router *mux.Router) {
 	router.HandleFunc("/api/v1/bookings/{flightID}", CreateBooking()).Methods("POST")
+	router.HandleFunc("/api/v1/payment/{bookingID}", MakePayment()).Methods("PATCH")
 }
 
 func CreateBooking() http.HandlerFunc {
@@ -54,5 +55,18 @@ func CreateBooking() http.HandlerFunc {
 
 		w.Write(successRes)
 
+	}
+}
+
+func MakePayment() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		bookingIDStr := vars["bookingID"]
+
+		paymentError := service.MakePayment(bookingIDStr)
+		if paymentError != nil {
+			http.Error(w, paymentError.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/config"
 	repository "github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/http/repositories"
@@ -80,5 +81,33 @@ func MakeBooking(flightId string, userId string, numOfSeats int) error {
 		return errors.New("booking failed, seats unblocked")
 	}
 
+	return nil
+}
+
+func MakePayment(bookingId string) error {
+	// Payment gateway integration goes here
+	// For demonstration purposes, we'll simulate payment
+	booking, err := repository.FetchBooking(bookingId)
+	if err != nil {
+		return err
+	}
+	if booking.Status == types.Cancelled {
+		return errors.New("booking is already cancelled")
+	}
+	if booking.Status == types.Booked {
+		return errors.New("payment is already done")
+	}
+	// if booking.CreatedAt is past 10 minutes ago, cancel the booking
+	createdAt, err := time.Parse(time.RFC3339, booking.CreatedAt)
+	if err != nil {
+		return errors.New("invalid booking creation time")
+	}
+	if createdAt.Add(10 * 60 * time.Second).Before(time.Now()) {
+		return errors.New("booking expired due to inactivity")
+	}
+	_, paymentErr := repository.MakePayment(bookingId)
+	if paymentErr != nil {
+		return paymentErr
+	}
 	return nil
 }
