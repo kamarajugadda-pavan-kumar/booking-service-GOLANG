@@ -5,11 +5,12 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/config"
 	repository "github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/http/repositories"
 	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/http/servicebase"
 	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/types"
 )
-
+var cfg config.Config = config.MustGetConfig()
 var servicebaseObj = servicebase.ServiceBase{BaseUrl: "http://localhost:3001"}
 
 func BlockSeats(flightId string, numOfSeats int) error {
@@ -19,7 +20,7 @@ func BlockSeats(flightId string, numOfSeats int) error {
 	}
 	_, err := servicebaseObj.PUT_POST_PATCH(
 		servicebase.MethodPatch,
-		"/api/v1/flight/"+flightId,
+		"/flight-search"+"/api/v1/flight/"+flightId,
 		BlockFlightSeatsBody{NoOfSeats: numOfSeats, Action: "decrease"})
 	if err != nil {
 		fmt.Println("error in blocking seats", err)
@@ -35,7 +36,7 @@ func UnblockSeats(flightId string, numOfSeats int) error {
 	}
 	_, err := servicebaseObj.PUT_POST_PATCH(
 		servicebase.MethodPatch,
-		"/api/v1/flight/"+flightId,
+		"/flight-search"+"/api/v1/flight/"+flightId,
 		UnBlockFlightSeatsBody{NoOfSeats: numOfSeats, Action: "increase"})
 	if err != nil {
 		return err
@@ -44,7 +45,7 @@ func UnblockSeats(flightId string, numOfSeats int) error {
 }
 
 func FetchFlightDetails(flightId string) (types.FlightData, error) {
-	flightResponse, err := servicebaseObj.GET("/api/v1/flight/" + flightId)
+	flightResponse, err := servicebaseObj.GET("/flight-search"+"/api/v1/flight/" + flightId)
 	if err != nil {
 		fmt.Printf("Failed to fetch flight details: %s\n", err)
 	}
