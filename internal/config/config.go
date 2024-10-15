@@ -26,6 +26,7 @@ type Config struct {
 	Env        string     `json:"env" yaml:"env" env-required:"true"`
 	Database   Database   `json:"database" yaml:"database" env-required:"true"`
 	HTTPServer HTTPServer `json:"http_server" yaml:"http_server"`
+	ApiGateway string     `json:"api_gateway" yaml:"api_gateway" env-required:"true"`
 }
 
 func MustGetConfig() Config {
