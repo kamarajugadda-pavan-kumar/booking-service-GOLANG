@@ -56,3 +56,8 @@ func MustGetConfig() Config {
 	}
 	return cfg
 }
+
+
+func GetConfig() Config {
+	return MustGetConfig()
+}
