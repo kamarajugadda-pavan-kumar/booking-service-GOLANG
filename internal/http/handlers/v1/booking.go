@@ -11,7 +11,7 @@ import (
 
 func RegisterBookingRoutes(router *mux.Router) {
 	router.HandleFunc("/api/v1/bookings/{flightID}", CreateBooking()).Methods("POST")
-	router.HandleFunc("/api/v1/payment/{bookingID}", MakePayment()).Methods("PATCH")
+	router.HandleFunc("/api/v1/bookings/make-payment/{bookingID}", MakePayment()).Methods("PATCH")
 	router.HandleFunc("/api/v1/bookings/cancel-booking/{bookingID}", CancelBooking()).Methods("PATCH")
 	router.HandleFunc("/api/v1/bookings/{bookingID}", FetchBooking()).Methods("GET")
 }
