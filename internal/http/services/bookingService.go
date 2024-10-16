@@ -11,8 +11,9 @@ import (
 	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/http/servicebase"
 	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/types"
 )
-var cfg config.Config = config.MustGetConfig()
-var servicebaseObj = servicebase.ServiceBase{BaseUrl: "http://localhost:3001"}
+
+var cfg = config.GetConfig()
+var servicebaseObj = servicebase.ServiceBase{BaseUrl: cfg.ApiGateway}
 
 func BlockSeats(flightId string, numOfSeats int) error {
 	type BlockFlightSeatsBody struct {
@@ -46,7 +47,7 @@ func UnblockSeats(flightId string, numOfSeats int) error {
 }
 
 func FetchFlightDetails(flightId string) (types.FlightData, error) {
-	flightResponse, err := servicebaseObj.GET("/flight-search"+"/api/v1/flight/" + flightId)
+	flightResponse, err := servicebaseObj.GET("/flight-search" + "/api/v1/flight/" + flightId)
 	if err != nil {
 		fmt.Printf("Failed to fetch flight details: %s\n", err)
 	}
@@ -55,16 +56,16 @@ func FetchFlightDetails(flightId string) (types.FlightData, error) {
 	return apiResponse.Data, err
 }
 
-func MakeBooking(flightId string, userId string, numOfSeats int) error {
-
+func MakeBooking(flightId string, userId string, numOfSeats int) (types.BookingSucessData, error) {
+	successResonse := types.BookingSucessData{}
 	flightDetails, err := FetchFlightDetails(flightId)
 	if err != nil {
-		return err
+		return successResonse, err
 	}
 
 	blockingSeatsErr := BlockSeats(flightId, numOfSeats)
 	if blockingSeatsErr != nil {
-		return blockingSeatsErr
+		return successResonse, blockingSeatsErr
 	}
 
 	bookingData := types.Booking{
@@ -74,14 +75,33 @@ func MakeBooking(flightId string, userId string, numOfSeats int) error {
 		NumOfSeats: int64(numOfSeats),
 		TotalCost:  float64(int64(numOfSeats) * flightDetails.Price),
 	}
-	_, bookingErr := repository.BookingRepository(bookingData)
+	response, bookingErr := repository.BookingRepository(bookingData)
 	if bookingErr != nil {
 		// If booking fails, unblock seats
 		UnblockSeats(flightId, numOfSeats)
-		return errors.New("booking failed, seats unblocked")
+		return successResonse, errors.New("booking failed, seats unblocked")
 	}
 
-	return nil
+	return response, nil
+}
+
+func CancelBooking(bookingId string) (string, error) {
+	res, err := repository.CancelBooking(bookingId)
+	if err != nil {
+		return res, err
+	}
+	return res, nil
+}
+
+func FetchBooking(bookingId string) (types.Booking, error) {
+	booking, err := repository.FetchBooking(bookingId)
+	if err != nil {
+		return booking, err
+	}
+	if booking.Status == types.Cancelled {
+		return booking, errors.New("booking is cancelled")
+	}
+	return booking, nil
 }
 
 func MakePayment(bookingId string) error {
