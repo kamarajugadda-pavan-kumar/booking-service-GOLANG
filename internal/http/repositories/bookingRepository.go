@@ -9,12 +9,13 @@ import (
 	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/types"
 )
 
-func BookingRepository(booking types.Booking) (string, error) {
+func BookingRepository(booking types.Booking) (types.BookingSucessData, error) {
 	database := db.GetDB()
-	// Start a transaction
+	successResponse := types.BookingSucessData{}
+
 	tx, err := database.Begin()
 	if err != nil {
-		return "", err
+		return successResponse, err
 	}
 
 	// Defer rollback in case anything fails
@@ -24,21 +25,27 @@ func BookingRepository(booking types.Booking) (string, error) {
 		}
 	}()
 
-	// Create booking query
 	query := `INSERT INTO Booking (userId, flightId, numOfSeats, totalCost, status) 
 	          VALUES (?, ?, ?, ?, ?)`
-	_, err = tx.Exec(query, booking.UserID, booking.FlightID, booking.NumOfSeats, booking.TotalCost, booking.Status)
+	result, err := tx.Exec(query, booking.UserID, booking.FlightID, booking.NumOfSeats, booking.TotalCost, booking.Status)
 	if err != nil {
-		tx.Rollback() // Rollback the transaction if insert fails
-		return "", errors.New("booking failed: " + err.Error())
+		tx.Rollback()
+		return successResponse, errors.New("booking failed: " + err.Error())
 	}
 
-	// Commit the transaction
+	// Retrieve the last inserted ID
+	insertedID, err := result.LastInsertId()
+	if err != nil {
+		tx.Rollback()
+		return successResponse, errors.New("failed to retrieve inserted ID: " + err.Error())
+	}
+
 	if err := tx.Commit(); err != nil {
-		return "", errors.New("failed to commit transaction: " + err.Error())
+		return successResponse, errors.New("failed to commit transaction: " + err.Error())
 	}
+	successResponse.BookingID = int(insertedID)
 
-	return fmt.Sprintf("Booking created successfully for user ID: %s", booking.UserID), nil
+	return successResponse, nil
 }
 
 func MakePayment(bookingId string) (string, error) {
@@ -97,7 +104,7 @@ func CancelBooking(bookingId string) (string, error) {
 		}
 	}()
 
-	query := `UPDATE Booking SET (status) VALUES (?) WHERE id =?`
+	query := `UPDATE Booking SET status = ? WHERE bookingId = ?`
 	_, err = tx.Exec(query, types.Cancelled, bookingId)
 	if err != nil {
 		tx.Rollback() // Rollback the transaction if update fails
