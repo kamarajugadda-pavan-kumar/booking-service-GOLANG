@@ -29,6 +29,8 @@ type Config struct {
 	ApiGateway string     `json:"api_gateway" yaml:"api_gateway" env-required:"true"`
 }
 
+var cfg Config
+
 func MustGetConfig() Config {
 	var configPath string
 
@@ -48,7 +50,7 @@ func MustGetConfig() Config {
 		log.Fatalf("config file %s not found", configPath)
 	}
 
-	var cfg Config
+	// var cfg Config
 
 	fileReadError := cleanenv.ReadConfig(configPath, &cfg)
 	if err != nil {
@@ -57,7 +59,7 @@ func MustGetConfig() Config {
 	return cfg
 }
 
-
 func GetConfig() Config {
-	return MustGetConfig()
+	// return MustGetConfig()
+	return cfg
 }
