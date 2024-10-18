@@ -12,14 +12,17 @@ import (
 	"github.com/kamarajugadda-pavan-kumar/booking-service-GOLANG/internal/types"
 )
 
-var cfg = config.GetConfig()
-var servicebaseObj = servicebase.ServiceBase{BaseUrl: cfg.ApiGateway}
+var cfg config.Config
+var servicebaseObj servicebase.ServiceBase
 
 func BlockSeats(flightId string, numOfSeats int) error {
 	type BlockFlightSeatsBody struct {
 		NoOfSeats int    `json:"noOfSeats"`
 		Action    string `json:"action"`
 	}
+
+	cfg = config.GetConfig()
+	servicebaseObj = servicebase.ServiceBase{BaseUrl: cfg.ApiGateway}
 	_, err := servicebaseObj.PUT_POST_PATCH(
 		servicebase.MethodPatch,
 		"/flight-search"+"/api/v1/flight/"+flightId,
@@ -36,6 +39,8 @@ func UnblockSeats(flightId string, numOfSeats int) error {
 		NoOfSeats int    `json:"noOfSeats"`
 		Action    string `json:"action"`
 	}
+	cfg = config.GetConfig()
+	servicebaseObj = servicebase.ServiceBase{BaseUrl: cfg.ApiGateway}
 	_, err := servicebaseObj.PUT_POST_PATCH(
 		servicebase.MethodPatch,
 		"/flight-search"+"/api/v1/flight/"+flightId,
@@ -47,6 +52,8 @@ func UnblockSeats(flightId string, numOfSeats int) error {
 }
 
 func FetchFlightDetails(flightId string) (types.FlightData, error) {
+	cfg = config.GetConfig()
+	servicebaseObj = servicebase.ServiceBase{BaseUrl: cfg.ApiGateway}
 	flightResponse, err := servicebaseObj.GET("/flight-search" + "/api/v1/flight/" + flightId)
 	if err != nil {
 		fmt.Printf("Failed to fetch flight details: %s\n", err)

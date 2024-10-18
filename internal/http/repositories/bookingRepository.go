@@ -78,10 +78,37 @@ func MakePayment(bookingId string) (string, error) {
 
 func FetchBooking(bookingId string) (types.Booking, error) {
 	database := db.GetDB()
-	query := `SELECT * FROM Booking WHERE bookingId =?`
+	query := `SELECT 
+				b.bookingId,
+				b.flightId,
+                b.userId,
+                b.status,
+                b.numOfSeats,
+                b.totalCost,
+				b.createdAt,
+                b.updatedAt,
+                f.flightNumber,
+                f.airplaneId,
+                f.departureAirportId
+				FROM Booking b
+				JOIN Flights f
+				ON b.flightId = f.id 
+				WHERE bookingId =?`
 	var booking types.Booking
 	row := database.QueryRow(query, bookingId)
-	err := row.Scan(&booking.BookingID, &booking.FlightID, &booking.UserID, &booking.Status, &booking.NumOfSeats, &booking.TotalCost, &booking.CreatedAt, &booking.UpdatedAt)
+	err := row.Scan(
+		&booking.BookingID,
+		&booking.FlightID,
+		&booking.UserID,
+		&booking.Status,
+		&booking.NumOfSeats,
+		&booking.TotalCost,
+		&booking.CreatedAt,
+		&booking.UpdatedAt,
+		&booking.FlightDetails.FlightNumber,
+		&booking.FlightDetails.AirplaneID,
+		&booking.FlightDetails.DepartureAirport,
+	)
 	if err == sql.ErrNoRows {
 		return booking, errors.New("booking not found")
 	} else if err != nil {
