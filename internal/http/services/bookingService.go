@@ -125,7 +125,7 @@ func MakePayment(bookingId string) error {
 		return errors.New("payment is already done")
 	}
 	// if booking.CreatedAt is past 10 minutes ago, cancel the booking
-	createdAt, err := time.Parse(time.RFC3339, booking.CreatedAt)
+	createdAt, err := time.Parse(time.DateTime, booking.CreatedAt)
 	if err != nil {
 		return errors.New("invalid booking creation time")
 	}
@@ -137,4 +137,8 @@ func MakePayment(bookingId string) error {
 		return paymentErr
 	}
 	return nil
+}
+
+func FetchBookingHistory(userId string) ([]types.Booking, error) {
+	return repository.FetchBookingHistory(userId)
 }

@@ -62,7 +62,7 @@ func MakePayment(bookingId string) (string, error) {
 		}
 	}()
 
-	query := `UPDATE Booking SET (status) VALUES (?) WHERE id = ?`
+	query := `UPDATE Booking SET status =?  WHERE bookingId = ?`
 	_, err = tx.Exec(query, types.Booked, bookingId)
 	if err != nil {
 		tx.Rollback() // Rollback the transaction if update fails
@@ -143,4 +143,60 @@ func CancelBooking(bookingId string) (string, error) {
 	}
 
 	return fmt.Sprintf("Booking cancelled successfully for booking ID: %s", bookingId), nil
+}
+
+func FetchBookingHistory(userId string) ([]types.Booking, error) {
+	database := db.GetDB()
+	query := `SELECT 
+                b.bookingId,
+                b.flightId,
+                b.userId,
+                b.status,
+                b.numOfSeats,
+                b.totalCost,
+                b.createdAt,
+                b.updatedAt,
+                f.flightNumber,
+                f.airplaneId,
+                f.departureAirportId,
+                f.arrivalAirportId,
+                f.arrivalTime,
+				f.departureTime,
+				f.boardingGate
+                FROM Booking b
+                JOIN Flights f
+                ON b.flightId = f.id
+				WHERE b.userId =?`
+	rows, err := database.Query(query, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var bookings []types.Booking
+	for rows.Next() {
+		var booking types.Booking
+		err := rows.Scan(
+			&booking.BookingID,
+			&booking.FlightID,
+			&booking.UserID,
+			&booking.Status,
+			&booking.NumOfSeats,
+			&booking.TotalCost,
+			&booking.CreatedAt,
+			&booking.UpdatedAt,
+			&booking.FlightDetails.FlightNumber,
+			&booking.FlightDetails.AirplaneID,
+			&booking.FlightDetails.DepartureAirport,
+			&booking.FlightDetails.ArrivalAirport,
+			&booking.FlightDetails.ArrivalTime,
+			&booking.FlightDetails.DepartureTime,
+			&booking.FlightDetails.BoardingGate,
+		)
+		if err != nil {
+			return nil, err
+		}
+		bookings = append(bookings, booking)
+	}
+	return bookings, nil
 }
