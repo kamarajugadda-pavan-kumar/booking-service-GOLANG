@@ -1,0 +1,12 @@
+env: "production"
+
+database:
+  name: "flights"
+  host: "localhost"
+  port: "5432"
+  username: "your_username"
+  password: "your_password"
+
+http_server:
+  address: "http://localhost"
+  port: "8000"

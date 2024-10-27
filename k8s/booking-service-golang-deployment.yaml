@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-service-golang-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking-service-golang
+  template:
+    metadata:
+      labels:
+        app: booking-service-golang
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "{{ .Date.Unix }}"
+    spec:
+      containers:
+        - name: booking-service-golang
+          image: pavankd12/booking-service-golang:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 50002
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "512Mi"
+              cpu: "1"
