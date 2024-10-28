@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: booking-service-golang-config
+data:
+  HTTP_PORT: "50002"
+  HTTP_ADDRESS: "localhost"
+  API_GATEWAY: "http://api-gateway.default.svc.cluster.local:50000"

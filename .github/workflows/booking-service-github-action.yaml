@@ -41,7 +41,12 @@ jobs:
       - name: Build and push Docker image
         run: |
           IMAGE_TAG="${{ github.sha }}"
-          docker build --no-cache --build-arg VITE_BASE_URL=${{ secrets.VITE_BASE_URL }} \
+          docker build --no-cache \
+            --build-arg DB_HOST=${{ secrets.DB_HOST }} \
+            --build-arg DB_NAME=${{ secrets.DB_NAME }} \
+            --build-arg DB_PORT=${{ secrets.DB_PORT }} \
+            --build-arg DB_PW=${{ secrets.DB_PW }} \
+            --build-arg DB_UN=${{ secrets.DB_UN }} \
             -t ${{ secrets.DOCKER_USERNAME }}/booking-service-golang:${IMAGE_TAG} \
             -t ${{ secrets.DOCKER_USERNAME }}/booking-service-golang:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/booking-service-golang:${IMAGE_TAG}

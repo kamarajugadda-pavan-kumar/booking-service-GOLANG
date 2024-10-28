@@ -1,32 +1,23 @@
 # Stage 1: Build the Go binary
 FROM golang:1.18-alpine AS builder
-
-# Set working directory in container
 WORKDIR /app
-
-# Copy go.mod and go.sum files
 COPY go.mod go.sum ./
-
-# Download dependencies
 RUN go mod download
-
-# Copy the source code
 COPY . .
+RUN go build -o main ./cmd/booking-service-GOLANG/main
 
-# Build the Go application
-RUN go build -o myapp .
-
-# Stage 2: Run the Go binary
+# Stage 2: Run the Go binary with configuration
 FROM alpine:latest
-
-# Set working directory in container
 WORKDIR /app
+COPY --from=builder /app/main .
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
-# Copy the binary from the builder stage
-COPY --from=builder /app/myapp .
+# Pass the build arguments to runtime environment
+ARG DB_HOST ARG DB_NAME ARG DB_PORT ARG DB_PW ARG DB_UN
+ENV DB_HOST=${DB_HOST} DB_NAME=${DB_NAME} DB_PORT=${DB_PORT} DB_PW=${DB_PW} DB_UN=${DB_UN} 
 
-# Expose the port your app runs on (adjust as necessary)
+# Expose the HTTP port
 EXPOSE 50002
 
-# Run the Go application
-CMD ["./myapp"]
+ENTRYPOINT ["/app/entrypoint.sh"]

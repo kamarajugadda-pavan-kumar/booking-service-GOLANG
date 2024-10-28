@@ -17,6 +17,9 @@ spec:
       containers:
         - name: booking-service-golang
           image: pavankd12/booking-service-golang:latest
+          envFrom:
+            - configMapRef:
+                name: booking-service-golang-config
           imagePullPolicy: Always
           ports:
             - containerPort: 50002
