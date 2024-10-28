@@ -15,6 +15,9 @@ COPY entrypoint.sh /app/entrypoint.sh
 # Create config directory
 RUN mkdir -p /app/config && chmod +x /app/entrypoint.sh
 
+# Debugging step
+RUN ls -la /app
+
 # Pass the build arguments to runtime environment
 ARG DB_HOST ARG DB_NAME ARG DB_PORT ARG DB_PW ARG DB_UN
 ENV DB_HOST=${DB_HOST} DB_NAME=${DB_NAME} DB_PORT=${DB_PORT} DB_PW=${DB_PW} DB_UN=${DB_UN} 
