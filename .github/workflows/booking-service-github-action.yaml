@@ -47,10 +47,10 @@ jobs:
             --build-arg DB_PORT=${{ secrets.DB_PORT }} \
             --build-arg DB_PW=${{ secrets.DB_PW }} \
             --build-arg DB_UN=${{ secrets.DB_UN }} \
-            -t ${{ secrets.DOCKER_USERNAME }}/booking-service-golang:${IMAGE_TAG} \
-            -t ${{ secrets.DOCKER_USERNAME }}/booking-service-golang:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/booking-service-golang:${IMAGE_TAG}
-          docker push ${{ secrets.DOCKER_USERNAME }}/booking-service-golang:latest
+            -t ${{ secrets.DOCKER_USERNAME }}/flight-booking-service:${IMAGE_TAG} \
+            -t ${{ secrets.DOCKER_USERNAME }}/flight-booking-service:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/flight-booking-service:${IMAGE_TAG}
+          docker push ${{ secrets.DOCKER_USERNAME }}/flight-booking-service:latest
 
       - name: Update Kubernetes deployment
         run: |
@@ -59,12 +59,12 @@ jobs:
 
           # Update the image tag in deployment file
           sed -i "s|kubectl.kubernetes.io/restartedAt:.*|kubectl.kubernetes.io/restartedAt: '$TIMESTAMP'|" k8s/booking-service-golang-deployment.yaml
-          sed -i 's|image: ${{ secrets.DOCKER_USERNAME }}/booking-service-golang:.*|image: ${{ secrets.DOCKER_USERNAME }}/booking-service-golang:${{ github.sha }}|' k8s/booking-service-golang-deployment.yaml
+          sed -i 's|image: ${{ secrets.DOCKER_USERNAME }}/flight-booking-service:.*|image: ${{ secrets.DOCKER_USERNAME }}/booking-service-golang:${{ github.sha }}|' k8s/booking-service-golang-deployment.yaml
 
           # Apply the changes
-          kubectl apply -f k8s/booking-service-golang-config.yaml
-          kubectl apply -f k8s/booking-service-golang-deployment.yaml
-          kubectl apply -f k8s/booking-service-golang-service.yaml
+          kubectl apply -f k8s/flight-booking-service-config.yaml
+          kubectl apply -f k8s/flight-booking-service-deployment.yaml
+          kubectl apply -f k8s/flight-booking-service-service.yaml
 
       # - name: Force rollout restart
       #   run: |

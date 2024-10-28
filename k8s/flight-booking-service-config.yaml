@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: booking-service-golang-config
+  name: flight-booking-service-config
 data:
   HTTP_PORT: "50002"
   HTTP_ADDRESS: "localhost"

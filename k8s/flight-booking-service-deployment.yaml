@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: booking-service-golang-deployment
+  name: flight-booking-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: booking-service-golang
+      app: flight-booking-service
   template:
     metadata:
       labels:
-        app: booking-service-golang
+        app: flight-booking-service
       annotations:
         kubectl.kubernetes.io/restartedAt: "{{ .Date.Unix }}"
     spec:
       containers:
-        - name: booking-service-golang
-          image: pavankd12/booking-service-golang:latest
+        - name: flight-booking-service
+          image: pavankd12/flight-booking-service:latest
           envFrom:
             - configMapRef:
-                name: booking-service-golang-config
+                name: flight-booking-service-config
           imagePullPolicy: Always
           ports:
             - containerPort: 50002
