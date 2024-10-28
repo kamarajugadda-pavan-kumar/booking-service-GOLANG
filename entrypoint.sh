@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Ensure the config directory exists
+mkdir -p /app/config
+
 # Create or overwrite the production.yaml file in the config folder
 cat <<EOL > /app/config/production.yaml
 env: "production"
@@ -22,4 +25,4 @@ echo "Production config file created/overwritten at /app/config/production.yaml:
 cat /app/config/production.yaml
 
 # Start the Golang application
-exec ./main --config /app/config/production.yaml
+./main --config /app/config/production.yaml
