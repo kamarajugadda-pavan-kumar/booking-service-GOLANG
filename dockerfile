@@ -11,7 +11,9 @@ FROM alpine:latest
 WORKDIR /app
 COPY --from=builder /app/main .
 COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+
+# Create config directory
+RUN mkdir -p /app/config && chmod +x /app/entrypoint.sh
 
 # Pass the build arguments to runtime environment
 ARG DB_HOST ARG DB_NAME ARG DB_PORT ARG DB_PW ARG DB_UN

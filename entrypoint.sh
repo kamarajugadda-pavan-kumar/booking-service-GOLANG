@@ -22,4 +22,4 @@ echo "Production config file created/overwritten at /app/config/production.yaml:
 cat /app/config/production.yaml
 
 # Start the Golang application
-./main --config /app/config/production.yaml
+exec ./main --config /app/config/production.yaml
