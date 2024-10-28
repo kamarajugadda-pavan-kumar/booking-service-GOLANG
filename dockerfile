@@ -4,7 +4,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN go build -o main ./cmd/booking-service-GOLANG/main
+RUN go build -o main ./cmd/booking-service-GOLANG/main.go
 
 # Stage 2: Run the Go binary with configuration
 FROM alpine:latest
