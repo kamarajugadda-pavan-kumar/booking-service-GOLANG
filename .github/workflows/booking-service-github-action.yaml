@@ -62,6 +62,7 @@ jobs:
           sed -i 's|image: ${{ secrets.DOCKER_USERNAME }}/booking-service-golang:.*|image: ${{ secrets.DOCKER_USERNAME }}/booking-service-golang:${{ github.sha }}|' k8s/booking-service-golang-deployment.yaml
 
           # Apply the changes
+          kubectl apply -f k8s/booking-service-golang-config.yaml
           kubectl apply -f k8s/booking-service-golang-deployment.yaml
           kubectl apply -f k8s/booking-service-golang-service.yaml
 
