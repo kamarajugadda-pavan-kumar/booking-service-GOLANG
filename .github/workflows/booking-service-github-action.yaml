@@ -58,8 +58,8 @@ jobs:
           TIMESTAMP=$(date +%s)
 
           # Update the image tag in deployment file
-          sed -i "s|kubectl.kubernetes.io/restartedAt:.*|kubectl.kubernetes.io/restartedAt: '$TIMESTAMP'|" k8s/booking-service-golang-deployment.yaml
-          sed -i 's|image: ${{ secrets.DOCKER_USERNAME }}/flight-booking-service:.*|image: ${{ secrets.DOCKER_USERNAME }}/booking-service-golang:${{ github.sha }}|' k8s/booking-service-golang-deployment.yaml
+          sed -i "s|kubectl.kubernetes.io/restartedAt:.*|kubectl.kubernetes.io/restartedAt: '$TIMESTAMP'|" k8s/flight-booking-service-deployment.yaml
+          sed -i 's|image: ${{ secrets.DOCKER_USERNAME }}/flight-booking-service:.*|image: ${{ secrets.DOCKER_USERNAME }}/flight-booking-service:${{ github.sha }}|' k8s/flight-booking-service-deployment.yaml
 
           # Apply the changes
           kubectl apply -f k8s/flight-booking-service-config.yaml
@@ -68,5 +68,5 @@ jobs:
 
       # - name: Force rollout restart
       #   run: |
-      #     kubectl rollout restart deployment booking-service-golang-deployment
-      #     kubectl rollout status deployment booking-service-golang-deployment
+      #     kubectl rollout restart deployment flight-booking-service-deployment
+      #     kubectl rollout status deployment flight-booking-service-deployment
