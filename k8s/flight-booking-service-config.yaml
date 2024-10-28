@@ -4,5 +4,5 @@ metadata:
   name: flight-booking-service-config
 data:
   HTTP_PORT: "50002"
-  HTTP_ADDRESS: "localhost"
+  HTTP_ADDRESS: "0.0.0.0"
   API_GATEWAY: "http://api-gateway.default.svc.cluster.local:50000"
