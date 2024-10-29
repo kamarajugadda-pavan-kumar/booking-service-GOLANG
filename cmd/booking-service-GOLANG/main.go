@@ -34,7 +34,7 @@ func main() {
 
 	// setup http server
 	httpServer := &http.Server{
-		Addr:    cfg.HTTPServer.Address + ":" + cfg.HTTPServer.Port,
+		Addr:    "0.0.0.0:" + cfg.HTTPServer.Port,
 		Handler: router,
 	}
 
