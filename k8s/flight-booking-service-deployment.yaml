@@ -26,7 +26,7 @@ spec:
           resources:
             requests:
               memory: "128Mi" # Reduced memory request
-              cpu: "250m" # Reduced CPU request
+              cpu: "200m" # Reduced CPU request
             limits:
               memory: "256Mi" # Reduced memory limit
               cpu: "500m" # Reduced CPU limit
