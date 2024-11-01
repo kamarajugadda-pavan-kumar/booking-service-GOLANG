@@ -62,7 +62,6 @@ jobs:
           sed -i 's|image: ${{ secrets.DOCKER_USERNAME }}/flight-booking-service:.*|image: ${{ secrets.DOCKER_USERNAME }}/flight-booking-service:${{ github.sha }}|' k8s/flight-booking-service-deployment.yaml
 
           # Apply the changes
-          kubectl delete deployment flight-booking-service
           kubectl apply -f k8s/flight-booking-service-config.yaml
           kubectl apply -f k8s/flight-booking-service-deployment.yaml
           kubectl apply -f k8s/flight-booking-service-service.yaml
